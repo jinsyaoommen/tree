@@ -8,7 +8,7 @@ import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 
 import { colors } from "./Theme";
 import CheckboxInput from "./CheckboxInput";
-
+import getAllChildNodes from "./util/getAllChildNodes";
 
 library.add(faCaretRight);
 library.add(faCaretDown);
@@ -64,6 +64,22 @@ const ContentWrapper = styled.div`
   }
 `;
 
+const SelectAllWrapper = styled.div`
+  padding: 5px 15px 5px 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-weight: 400;
+  font-size: 14px;
+  color: ${colors.black.dark};
+  background-color: ${colors.whiteSmoke.light};
+  border-bottom: 1px solid ${colors.whiteSmoke.medium};
+  &:hover {
+    background-clip: padding-box;
+    background-color: ${colors.white.medium};
+  }
+`;
+
 const CaptionWrapper = styled.div`
   flex-basis: 90%;
   white-space: nowrap;
@@ -84,6 +100,17 @@ const Tree = (props) => {
         };
 
         return setToggleState(updatedState);
+    }
+
+    function updateCheckbox(checkedItem) {
+        return (data, item) => {
+            const allChildNodes = getAllChildNodes(data, item);
+            updateSelectedNodes(
+                checkedItem.target.checked
+                    ? { ...selectedNodes, ...{ [item.id]: item }, ...allChildNodes }
+                    : R.omit([item.id, ...R.keys(allChildNodes)], selectedNodes)
+            );
+        };
     }
 
     function renderNodes(data = [], depth = 0) {
@@ -108,13 +135,7 @@ const Tree = (props) => {
                     id={item.id}
                     isChecked={R.has(item.id, selectedNodes)}
                     isIndeterminate={false}
-                    onChange={(checkedItem) => {
-                        updateSelectedNodes(
-                            checkedItem.target.checked
-                                ? { ...selectedNodes, ...{ [item.id]: item } }
-                                : R.omit([item.id], selectedNodes)
-                        );
-                    }}
+                    onChange={(checkedItem) => updateCheckbox(checkedItem)(data, item)}
                 />
             );
 
@@ -139,9 +160,18 @@ const Tree = (props) => {
     }
 
     return (
-        <TreeWrapper>
-            {renderNodes(props.data)}
-        </TreeWrapper>
+        <Fragment>
+            <TreeWrapper>
+                <SelectAllWrapper>
+                    Select All
+                    <CheckboxInput
+
+                    />
+                </SelectAllWrapper>
+
+                {renderNodes(props.data)}
+            </TreeWrapper>
+        </Fragment>
     );
 };
 
