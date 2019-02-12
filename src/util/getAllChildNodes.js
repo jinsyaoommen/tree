@@ -4,13 +4,14 @@ import * as R from "ramda";
  * Given a predicate node, find all the child nodes.
  * @param treeData - [ { id: foo, childList: [{ id: bar }, { id: bloop }] } ]
  * @param selectedNode - { id: bar }
+ * @param selectAll - bool
  */
-export default function getAllChildNodes(treeData, selectedNode) {
+export default function getAllChildNodes(treeData, selectedNode, selectAll=false) {
     if (R.isNil(treeData) || R.isEmpty(treeData)) {
         return {};
     }
 
-    if (R.isNil(selectedNode) || R.isEmpty(selectedNode)) {
+    if ((R.isNil(selectedNode) || R.isEmpty(selectedNode)) && !selectAll) {
         return {};
     }
 
@@ -25,6 +26,10 @@ export default function getAllChildNodes(treeData, selectedNode) {
             }
         }
         return allNodes;
+    }
+
+    if (selectAll) {
+        return traverseTree(treeData);
     }
 
     return R.has("childList", selectedNode) ? traverseTree(selectedNode.childList) : allNodes;

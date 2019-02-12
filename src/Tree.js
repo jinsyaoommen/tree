@@ -103,8 +103,9 @@ const Tree = (props) => {
     }
 
     function updateCheckbox(checkedItem) {
-        return (data, item) => {
-            const allChildNodes = getAllChildNodes(data, item);
+        return (data, item, selectAll) => {
+            const allChildNodes = getAllChildNodes(data, item, selectAll);
+
             updateSelectedNodes(
                 checkedItem.target.checked
                     ? { ...selectedNodes, ...{ [item.id]: item }, ...allChildNodes }
@@ -165,7 +166,9 @@ const Tree = (props) => {
                 <SelectAllWrapper>
                     Select All
                     <CheckboxInput
-
+                        id="selectAll"
+                        isIndeterminate={false}
+                        onChange={(checkedItem) => updateCheckbox(checkedItem)(props.data, {}, true)}
                     />
                 </SelectAllWrapper>
 
